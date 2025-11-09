@@ -1,0 +1,229 @@
+{
+  "meta": {
+    "project": "Arquitectura SEO - Plataforma inmobiliaria (Opción A)",
+    "domain": "tudepa.pe",
+    "created_at": "2025-11-08",
+    "author": "Asistente (para Paul)",
+    "note": "Formato optimizado para ingestion en Cursor. Spanish-first. Un dominio con subdirectorios por operación y ciudad/distrito."
+  },
+  "url_structure": {
+    "site_root": "https://tudepa.pe",
+    "patterns": {
+      "home": "/",
+      "operation_root": "/{operation}/", 
+      "city_root": "/{operation}/{city}/",
+      "district": "/{operation}/{city}/{district}/",
+      "listing": "/propiedad/{listing-slug}-{id}/",
+      "agent": "/agente/{agent-slug}/",
+      "blog": "/blog/{year}/{month}/{slug}/",
+      "static": "/recursos/{slug}/"
+    },
+    "variables": {
+      "operation": ["alquiler","venta"],
+      "city": "slug de ciudad (e.g., lima, arequipa)",
+      "district": "slug de distrito (e.g., miraflores, surco)",
+      "listing-slug": "título amigable del inmueble",
+      "id": "id único numérico"
+    },
+    "rules": {
+      "lowercase": true,
+      "separator": "-",
+      "no_spaces": true,
+      "strip_accents": true,
+      "max_length_slug": 80
+    }
+  },
+  "sitemap_and_crawling": {
+    "sitemap_index": "/sitemap_index.xml",
+    "sitemap_patterns": [
+      "/sitemap-pages.xml",
+      "/sitemap-listings-{city}.xml",
+      "/sitemap-listings-{city}-{district}.xml",
+      "/sitemap-blog.xml"
+    ],
+    "priority_rules": {
+      "home": 1.0,
+      "city_root": 0.9,
+      "district": 0.8,
+      "listing": 0.6,
+      "blog": 0.5
+    },
+    "changefreq": {
+      "home": "daily",
+      "city_root": "daily",
+      "district": "daily",
+      "listing": "hourly",
+      "blog": "weekly"
+    },
+    "robots_txt": {
+      "allow": ["/", "/alquiler/", "/venta/"],
+      "disallow": ["/admin/", "/api/private/", "/checkout/"],
+      "sitemap": "https://tudepa.pe/sitemap_index.xml"
+    }
+  },
+  "page_templates": {
+    "Home": {
+      "path": "/",
+      "schema_type": "WebPage",
+      "title_template": "{brand} — Encuentra departamentos para {operation} en {primary_city}",
+      "meta_desc_template": "Busca y filtra departamentos en {primary_city}. Resultados por distrito, precio, habitaciones y más. Publica tu anuncio gratis.",
+      "h1_template": "Departamentos para {operation} en {primary_city}",
+      "content_min": {
+        "main_intro": 200,
+        "district_links": 10
+      },
+      "structured_data": ["BreadcrumbList"]
+    },
+    "CityLanding": {
+      "path_pattern": "/{operation}/{city}/",
+      "schema_type": "CollectionPage",
+      "title_template": "{operation_cap} en {city_name} — {brand}",
+      "meta_desc_template": "Listado de inmuebles para {operation} en {city_name}. Filtra por distrito, precio, tipo y amoblado.",
+      "h1_template": "{operation_cap} en {city_name}",
+      "content_min": {
+        "intro": 300,
+        "neighborhood_guides": 2
+      },
+      "internal_links": ["district_pages", "popular_filters", "blog_guides"],
+      "structured_data": ["BreadcrumbList", "ItemList"]
+    },
+    "DistrictLanding": {
+      "path_pattern": "/{operation}/{city}/{district}/",
+      "schema_type": "Place",
+      "title_template": "{operation_cap} en {district}, {city_name} — {brand}",
+      "meta_desc_template": "Encuentra departamentos para {operation} en {district}. Mejores zonas, precios promedio y listados actualizados.",
+      "h1_template": "{operation_cap} en {district}",
+      "content_min": {
+        "intro": 400,
+        "neighborhood_stats": true,
+        "top-listings": 6
+      },
+      "structured_data": ["Place", "ItemList", "BreadcrumbList"],
+      "local_seo": {
+        "gmb_recommendation": "Crear/optimizar perfil de Google Business Profile por ciudad y (si aplica) por distrito"
+      }
+    },
+    "ListingDetail": {
+      "path_pattern": "/propiedad/{listing-slug}-{id}/",
+      "schema_type": "Offer / House / Apartment",
+      "title_template": "{beds} hab • {price} • {district}, {city_name} | {brand}",
+      "meta_desc_template": "Departamento de {beds} hab en {district}, {city_name}. {area} m² • {amenities_summary}. Contacta para visitar.",
+      "h1_template": "{listing_title}",
+      "content_min": {
+        "description": 250,
+        "features_list": true,
+        "nearby_points": true
+      },
+      "structured_data": ["Offer", "Product", "Place", "ImageObject", "BreadcrumbList"],
+      "canonical_rule": "preferred URL without UTM or tracking params",
+      "open_graph": {
+        "og:type": "product",
+        "og:image": "{primary_image_url}",
+        "twitter:card": "summary_large_image"
+      },
+      "technical": {
+        "pagination_for_similar": false,
+        "noindex": false,
+        "index": true
+      }
+    },
+    "SearchResults": {
+      "path_pattern": "/{operation}/{city}/?{query_params}",
+      "schema_type": "SearchResultsPage",
+      "title_template": "Buscar {operation} en {city_name} — {brand}",
+      "meta_desc_template": "Resultados de {operation} en {city_name}. Filtra por distrito, precio, habitaciones y amoblado.",
+      "h1_template": "Resultados: {operation_cap} en {city_name}",
+      "content_min": {
+        "result_count_visible": true,
+        "applied_filters_ui": true
+      },
+      "faceted_navigation": true,
+      "canonicalization": {
+        "base": "/{operation}/{city}/",
+        "params_to_strip_for_canonical": ["utm_*", "session", "sort_timestamp"],
+        "canonicalize_view": "first page without transient params"
+      },
+      "pagination": {
+        "size": 24,
+        "use_rel_prev_next": true,
+        "pageParam": "page"
+      },
+      "structured_data": ["ItemList", "BreadcrumbList"]
+    },
+    "BlogPost": {
+      "path_pattern": "/blog/{year}/{month}/{slug}/",
+      "schema_type": "BlogPosting",
+      "title_template": "{post_title} — {brand}",
+      "meta_desc_template": "{summary_155chars}",
+      "h1_template": "{post_title}",
+      "content_min": {
+        "body": 800,
+        "images": 1
+      },
+      "structured_data": ["BlogPosting", "BreadcrumbList", "Author"],
+      "og_settings": true
+    },
+    "AMP_and_mobile": {
+      "mobile_first": true,
+      "amp_support": false,
+      "responsive_images": true
+    }
+  },
+  "seo_field_templates": {
+    "title_rules": {
+      "max_length": 60,
+      "format_examples": [
+        "{operation_cap} en {district}, {city_name} — {brand}",
+        "{beds} hab • {price} • {district} | {brand}"
+      ]
+    },
+    "meta_description_rules": {
+      "max_length": 155,
+      "include": ["operation", "district or city", "key benefit", "CTA (ej. Ver más)"]
+    },
+    "h1_rules": {
+      "unique_per_page": true,
+      "avoid_brand_repetition": "omit brand in H1 if present in title"
+    },
+    "image_alt_rules": "descriptive, include district or type when possible; max 125 chars",
+    "og_twitter": {
+      "og:title": "{title}",
+      "og:description": "{meta_description}",
+      "og:image": "{primary_image_url}",
+      "twitter:card": "summary_large_image"
+    }
+  },
+  "content_guidelines": {
+    "listing_description": {
+      "must_include": ["summary", "features", "measurements", "ubicacion_relativa", "condiciones_de_renta"],
+      "recommended_length": "250-600 palabras",
+      "seo_tips": ["usar keywords de cola larga (e.g., 'alquiler departamento miraflores amoblado 2 hab')", "incluir bullet points para lectura rápida"]
+    },
+    "city_and_district_pages": {
+      "must_include": ["intro_contextual", "precios_promedio (rango)", "ventajas_del_distrito", "transporte_y_servicios", "listado_destacado"],
+      "recommended_length": "400-1200 palabras",
+      "internal_links": ["listings", "related_districts", "blog_guides"]
+    },
+    "blog": {
+      "pillar_topics": ["Guías de barrio", "Tendencias de alquiler", "Checklists para inquilinos", "Finanzas y contratos"],
+      "seo_structure": ["H1 -> H2 (subtemas) -> H3 (detalles)"],
+      "schema_recommendation": "BlogPosting"
+    }
+  },
+  "technical_rules": {
+    "canonicalization": "cada recurso tiene una canonical limpia; parámetros de tracking deben removerse",
+    "faceted_navigation": {
+      "approach": "index only default/sort states; paginated/faceted states default to noindex or canonical to primary listing page",
+      "implementation_options": [
+        "Server-side canonical mapping of parameter combinations",
+        "Use rel=canonical to point to base filter set for heavy faceting",
+        "Implement url rewriting so critical filters appear in path for indexable combos (/alquiler/lima/miraflores/precio-1000-2000/)"
+      ]
+    },
+    "pagination": "rel=prev/next + self-referential canonical to first page or use page canonicalization when needed",
+    "structured_data": "JSON-LD inline per template; validate with Rich Results Test",
+    "images": {
+      "responsive": true,
+      "formats": ["webp","jpeg"],
+      "size_recommendation": "primary 1200x800 min; thumbnails 360x270",
+      "lazy

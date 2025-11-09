@@ -1,0 +1,263 @@
+{
+  "meta": {
+    "source_inspiration": "large-scale real-estate marketplace (homepage structure, search-forward UX, listing-first card grid, map integration) — used only for visual/structural inspiration, not copying content",
+    "created_at": "2025-11-08",
+    "purpose": "Provide design tokens, component specs and replication rules so an AI (Cursor) can generate UI with a consistent design system inspired by major real-estate portals."
+  },
+  "tokens": {
+    "color": {
+      "primary": { "name": "primary-blue", "value": "#0A66C2", "usage": "Brand actions, primary CTAs, links" },
+      "accent": { "name": "accent-teal", "value": "#00A6A6", "usage": "Highlights, badges, active filters" },
+      "neutral": {
+        "100": { "value": "#FFFFFF", "usage": "Background / surfaces" },
+        "200": { "value": "#F6F7F9", "usage": "Page background" },
+        "300": { "value": "#EBEEF3", "usage": "Cards background / separators" },
+        "400": { "value": "#C7CDD6", "usage": "Muted text / borders" },
+        "700": { "value": "#2C3E50", "usage": "Primary text" }
+      },
+      "status": {
+        "success": { "value": "#138D75", "usage": "Success states" },
+        "warning": { "value": "#E08A00", "usage": "Warnings" },
+        "danger": { "value": "#D64545", "usage": "Errors" }
+      }
+    },
+    "typography": {
+      "font_family": {
+        "ui": "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+        "display": "Inter, 'Segoe UI', system-ui"
+      },
+      "scale": {
+        "xxl": { "size": "32px", "weight": 600, "lineHeight": "40px", "usage": "Page headings" },
+        "xl": { "size": "24px", "weight": 600, "lineHeight": "32px", "usage": "Section headings" },
+        "lg": { "size": "18px", "weight": 600, "lineHeight": "24px", "usage": "Card titles" },
+        "md": { "size": "16px", "weight": 500, "lineHeight": "22px", "usage": "Primary body" },
+        "sm": { "size": "14px", "weight": 400, "lineHeight": "20px", "usage": "Secondary text" },
+        "xs": { "size": "12px", "weight": 400, "lineHeight": "16px", "usage": "Utility text" }
+      }
+    },
+    "spacing": {
+      "unit": 8,
+      "scale": {
+        "xs": 4,
+        "sm": 8,
+        "md": 16,
+        "lg": 24,
+        "xl": 32,
+        "xxl": 48
+      }
+    },
+    "layout": {
+      "container_widths": { "sm": 680, "md": 1024, "lg": 1280, "xl": 1440 },
+      "grid": {
+        "columns": 12,
+        "gutter": 16,
+        "listing_grid": {
+          "desktop": { "columns": 3, "gap": 24 },
+          "tablet": { "columns": 2, "gap": 16 },
+          "mobile": { "columns": 1, "gap": 12 }
+        }
+      },
+      "breakpoints": { "xs": 360, "sm": 640, "md": 920, "lg": 1200, "xl": 1600 }
+    },
+    "elevation": {
+      "none": { "boxShadow": "none" },
+      "card": { "boxShadow": "0 4px 12px rgba(10, 20, 30, 0.06)" },
+      "popover": { "boxShadow": "0 8px 24px rgba(10, 20, 30, 0.12)" }
+    },
+    "radius": { "sm": 6, "md": 10, "lg": 14 }
+  },
+  "components": {
+    "Header": {
+      "purpose": "Page-level navigation + persistent search",
+      "anatomy": ["brandLogo", "primaryNav", "searchBar", "accountActions"],
+      "layout": { "height": 72, "padding": ["md","lg"], "sticky": true },
+      "tokens": { "background": "neutral.100", "borderBottom": "1px solid neutral.300" },
+      "behavior": {
+        "search": "prominent center-placed on desktop; full-width collapsible on mobile",
+        "accessibility": "search field aria-label, skip links present"
+      },
+      "variants": ["compact (scrolled)", "expanded (homepage)"]
+    },
+    "SearchBar": {
+      "purpose": "Primary funnel for discovery (location + filters)",
+      "anatomy": ["inputText", "typeaheadSuggestions", "geoButton", "submitBtn", "quickFilters"],
+      "dimensions": { "height": 56, "borderRadius": "md" },
+      "tokens": { "bg": "neutral.100", "focusRing": "2px solid primary" },
+      "interactions": {
+        "typeaheadLatency": "debounced 250ms",
+        "keyboardSupport": ["ArrowUp/Down to navigate", "Enter to select", "Esc to close"]
+      },
+      "states": ["idle", "focused", "suggesting", "error", "empty"],
+      "responsiveness": "on mobile collapses to a single input + icon that expands to full screen modal for advanced filters"
+    },
+    "ListingCard": {
+      "purpose": "Compact representation of a property or item in a grid",
+      "anatomy": ["imageCarousel", "badgeRow", "title", "metaRow", "priceRow", "ctaRow"],
+      "layout": { "aspectRatio": "4:3 (image)", "padding": "md", "radius": "sm" },
+      "tokenBindings": {
+        "background": "neutral.100",
+        "titleColor": "neutral.700",
+        "mutedText": "neutral.400"
+      },
+      "states": ["default", "hover (elevate + shadow)", "selected", "disabled"],
+      "variants": ["compact", "comfortable", "map-tooltip"],
+      "accessibility": {
+        "imageAlt": "required",
+        "cardRole": "link",
+        "focus": "card-outline + shadow"
+      },
+      "metrics": {
+        "recommended_max_text_lines": { "title": 2, "meta": 2 },
+        "thumb_size": { "desktop": "360x270", "mobile": "320x240" }
+      }
+    },
+    "FiltersPanel": {
+      "purpose": "Refine search via facets (price, beds, property type, more)",
+      "anatomy": ["appliedChips", "rangeSliders", "multiSelectList", "toggles", "clearAll", "applyBtn"],
+      "layout": { "desktopBehavior": "left column sticky", "mobileBehavior": "collapsible bottom sheet" },
+      "interactionPattern": {
+        "immediateApply": "toggle for fast UX (default off)",
+        "debounceForRange": 400,
+        "chips": "show applied filters as removable chips"
+      },
+      "a11y": "each control keyboard accessible; labels linked to inputs; aria-live region for count updates"
+    },
+    "MapView": {
+      "purpose": "Geospatial browsing & sync with list",
+      "anatomy": ["mapCanvas", "clusterMarkers", "activePin", "miniPreviewCard", "mapControls"],
+      "behaviors": {
+        "listSync": "hovering card highlights pin; clicking pin opens preview card and centers map",
+        "clusterStrategy": "cluster at higher zoom, expand on zoom-in",
+        "lazyLoadTiles": true
+      },
+      "tokenBindings": { "pinColor": "accent", "clusterColor": "primary" },
+      "accessibility": "keyboard navigation to controls, provide textual list fallback"
+    },
+    "PropertyDetail": {
+      "purpose": "Full detail view with gallery, specs, contact actions, and data",
+      "anatomy": ["gallery", "summary", "priceStrip", "factsTable", "agentCard", "mortgageWidget", "nearbyListings"],
+      "layout": { "twoColumnDesktop": "gallery + details", "singleColumnMobile": true },
+      "componentsUsed": ["ListingCard", "CTA", "Modal", "Badge"],
+      "seoConsiderations": "structured data for property (schema.org) and metadata"
+    },
+    "CTA": {
+      "variants": {
+        "primary": { "bg": "primary", "textColor": "neutral.100", "padding": "sm md", "radius": "sm" },
+        "secondary": { "bg": "transparent", "border": "1px solid neutral.400", "textColor": "neutral.700" },
+        "ghost": { "bg": "transparent", "textColor": "primary" }
+      },
+      "states": ["default", "hover", "active", "disabled"],
+      "accessibility": "aria-pressed for toggle CTAs, clear focus ring"
+    },
+    "Modal": {
+      "purpose": "Detailed forms / large interactions (contact agent, schedule tour)",
+      "anatomy": ["titleBar", "closeBtn", "content", "actionsRow"],
+      "tokens": { "maxWidth": 920, "padding": "lg", "shadow": "popover" },
+      "behavior": {
+        "trapFocus": true,
+        "closeOnEsc": true,
+        "closeOnOverlayClick": false
+      }
+    },
+    "Toast": {
+      "position": "bottom-right (desktop) / top (mobile)",
+      "autoDismiss": 5000,
+      "types": ["success", "error", "info"],
+      "accessibility": "aria-live polite"
+    }
+  },
+  "patterns": {
+    "searchForwardFlow": {
+      "description": "Homepage centers discovery: large search + immediate suggestions, then results grid + map.",
+      "rules": [
+        "Present search input as the primary action on landing pages",
+        "Use typeahead and suggestive prompts (location, neighborhoods, category)",
+        "Show quick stats (result count) and a persistent filters bar"
+      ]
+    },
+    "progressiveDisclosure": {
+      "description": "Keep complex controls hidden until needed (advanced filters, mortgage calculators).",
+      "rules": [
+        "Default to 3-5 high-impact filters visible",
+        "Place advanced filters in a 'More filters' modal or collapsible"
+      ]
+    },
+    "list-map-sync": {
+      "description": "Always keep map and list synchronized for spatial context.",
+      "rules": [
+        "Hovering a list item highlights the map pin",
+        "Clicking a pin reveals a compact preview card that links to detail view",
+        "If map is visible, include a toggle to 'hide map' that resizes the list area"
+      ]
+    }
+  },
+  "accessibility": {
+    "contrast": "All body text >= 4.5:1 against background; large headings 3:1 allowed",
+    "keyboard": "All controls reachable via keyboard; logical tab order",
+    "aria": "Use roles for landmark regions; aria-live for dynamic counts; labels for inputs and icons",
+    "images": "All listing images must include alt text or decorative flag",
+    "reducedMotion": "Respect prefers-reduced-motion: minimize parallax and auto-play"
+  },
+  "motion": {
+    "easing": { "standard": "cubic-bezier(0.22, 1, 0.36, 1)", "sharp": "cubic-bezier(0.4, 0, 0.2, 1)" },
+    "durations": { "short": 120, "medium": 240, "long": 360 },
+    "usage": {
+      "listHover": { "property": "transform, box-shadow", "duration": "short", "easing": "standard" },
+      "modalOpen": { "property": "opacity, transform", "duration": "medium" }
+    }
+  },
+  "tokens_export_samples": {
+    "cssVariables": {
+      "--color-primary": "var(--primary-blue, #0A66C2)",
+      "--bg-page": "var(--neutral-200, #F6F7F9)",
+      "--text-primary": "var(--neutral-700, #2C3E50)",
+      "--radius-md": "10px"
+    },
+    "tailwind_map": {
+      "primary": "text-primary bg-primary",
+      "card": "bg-white shadow-card rounded-md p-4"
+    }
+  },
+  "developer_integration": {
+    "json_for_cursor": {
+      "example_component_call": {
+        "component": "ListingCard",
+        "props": {
+          "title": "PROPERTY_TITLE",
+          "price": "PRICE_STR",
+          "image_urls": ["IMG1_URL","IMG2_URL"],
+          "badges": ["New","OpenHouse"],
+          "meta": { "beds": 3, "baths": 2, "area": "1200 sqft" }
+        },
+        "renderHints": {
+          "layout": "compact",
+          "truncate": { "title": 2, "meta": 1 },
+          "cta": { "label": "View details", "variant": "primary" }
+        }
+      }
+    },
+    "component_contracts": {
+      "ListingCard": {
+        "requiredProps": ["title","price","image_urls"],
+        "optional": ["badges","meta","onClick"],
+        "states": ["hover","selected"],
+        "responsiveRules": "swap image ratio and move meta below image on mobile"
+      }
+    }
+  },
+  "brand_and_voice_guidelines": {
+    "visual_voice": "Trustworthy, efficient, data-forward",
+    "microcopy_tone": "concise, helpful, neutral (avoid promotional hyperbole)",
+    "photography_style": "bright, real-world interiors, 3:2 or 4:3 crop, avoid heavy filters",
+    "iconography": "line icons with 2px stroke; filled for active states"
+  },
+  "handoff": {
+    "recommended_assets": [
+      "SVG icon set (outline + filled)",
+      "Image guidelines PDF (sizes and crops)",
+      "Component JSON manifest (this file)",
+      "Figma/Sketch tokens file"
+    ],
+    "dev_notes": "Expose tokens as CSS vars; build components as accessible React components; ensure map/list sync via a shared store (e.g., redux or context)."
+  }
+}

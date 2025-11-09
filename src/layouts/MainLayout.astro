@@ -1,0 +1,580 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  seo?: {
+    keywords?: string;
+    canonical?: string;
+    noindex?: boolean;
+  };
+  social?: {
+    ogImage?: string;
+    ogType?: string;
+  };
+  geo?: {
+    region?: string;
+    position?: string;
+    ICBM?: string;
+  };
+  structuredData?: object | object[];
+  breadcrumbs?: Array<{ name: string; url: string }>;
+}
+
+const siteUrl = "https://encuentrahogar.pe";
+const siteName = "Encuentra Hogar";
+const defaultImage = `${siteUrl}/images/og-default.jpg`;
+
+const { 
+  title = "Encuentra Hogar - Plataforma Inmobiliaria en Lima",
+  description = "Busca y encuentra departamentos para alquiler en Lima. Filtra por distrito, precio, habitaciones y más.",
+  seo = {},
+  social = {},
+  geo = {},
+  structuredData,
+  breadcrumbs
+} = Astro.props;
+
+// Valores por defecto para SEO
+const keywords = seo.keywords || "alquiler departamentos Lima, venta casas Lima, inmuebles Perú, propiedades Lima";
+const noindex = seo.noindex || false;
+const canonicalUrl = seo.canonical || new URL(Astro.url.pathname, siteUrl).href;
+
+// Valores por defecto para Social
+const ogImage = social.ogImage || defaultImage;
+const ogType = social.ogType || "website";
+
+// Valores por defecto para Geo
+const geoRegion = geo.region || "Lima, PE";
+const geoPosition = geo.position || "-12.0464;-77.0428";
+const ICBM = geo.ICBM || "-12.0464, -77.0428";
+
+// Combinar structured data (incluyendo breadcrumbs si existen)
+const allStructuredData = [
+  ...(structuredData ? [structuredData].flat() : []),
+  ...(breadcrumbs?.length ? [{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": breadcrumbs.map((item, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "name": item.name,
+      "item": item.url
+    }))
+  }] : [])
+];
+
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    
+    {/* SEO Meta Tags */}
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"} />
+    <link rel="canonical" href={canonicalUrl} />
+    
+    {/* Geo Meta Tags (SEO Local) */}
+    <meta name="geo.region" content={geoRegion} />
+    <meta name="geo.position" content={geoPosition} />
+    <meta name="ICBM" content={ICBM} />
+    
+    {/* Open Graph Meta Tags */}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={title} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:locale" content="es_PE" />
+    
+    {/* Twitter Card Meta Tags */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={title} />
+    
+    {/* Favicon */}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    {/* Structured Data JSON-LD */}
+    {allStructuredData.length > 0 && allStructuredData.map((data, index) => (
+      <script type="application/ld+json" set:html={JSON.stringify(data)} />
+    ))}
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+    
+    <header class="header" role="banner">
+      <div class="header-container">
+        <!-- Brand Logo -->
+        <div class="brand-logo">
+          <a href="/" aria-label="Encuentra Hogar - Inicio">
+            <span class="logo-text">Encuentra Hogar</span>
+          </a>
+        </div>
+
+        <!-- Primary Navigation -->
+        <nav class="primary-nav" aria-label="Navegación principal">
+          <ul class="nav-list">
+            <li><a href="/alquiler/lima" class="nav-link">Alquiler</a></li>
+            <li><a href="/venta/lima" class="nav-link">Venta</a></li>
+            <li><a href="/distritos" class="nav-link">Distritos</a></li>
+          </ul>
+        </nav>
+
+        <!-- Search Bar -->
+        <div class="search-bar-container">
+          <form class="search-bar" action="/buscar" method="get" role="search">
+            <label for="search-input" class="sr-only">Buscar propiedades</label>
+            <input
+              id="search-input"
+              type="text"
+              name="q"
+              placeholder="Buscar por ubicación, distrito..."
+              class="search-input"
+              aria-label="Buscar propiedades"
+            />
+            <button type="submit" class="search-button" aria-label="Buscar">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19 19L14.65 14.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- Account Actions -->
+        <div class="account-actions">
+          <a href="/publicar" class="btn-secondary">Publicar</a>
+          <a href="/iniciar-sesion" class="btn-ghost">Iniciar Sesión</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content" class="main-content">
+      {/* Breadcrumbs Navigation */}
+      {breadcrumbs && breadcrumbs.length > 0 && (
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <ol class="breadcrumbs-list">
+            {breadcrumbs.map((item, index) => (
+              <li class="breadcrumbs-item">
+                {index < breadcrumbs.length - 1 ? (
+                  <a href={item.url} class="breadcrumbs-link">{item.name}</a>
+                ) : (
+                  <span class="breadcrumbs-current" aria-current="page">{item.name}</span>
+                )}
+                {index < breadcrumbs.length - 1 && (
+                  <span class="breadcrumbs-separator" aria-hidden="true">/</span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
+      
+      <slot />
+    </main>
+
+    <footer class="footer" role="contentinfo">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h3 class="footer-title">Encuentra Hogar</h3>
+          <p class="footer-text">La plataforma inmobiliaria líder en Lima</p>
+        </div>
+        <div class="footer-section">
+          <h4 class="footer-subtitle">Enlaces</h4>
+          <ul class="footer-links">
+            <li><a href="/sobre-nosotros">Sobre Nosotros</a></li>
+            <li><a href="/contacto">Contacto</a></li>
+            <li><a href="/ayuda">Ayuda</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4 class="footer-subtitle">Legal</h4>
+          <ul class="footer-links">
+            <li><a href="/terminos">Términos y Condiciones</a></li>
+            <li><a href="/privacidad">Política de Privacidad</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Encuentra Hogar. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  @import '../styles/global.css';
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-ui);
+    color: var(--color-neutral-700);
+    background-color: var(--color-neutral-200);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Skip Link */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--color-primary);
+    color: white;
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-decoration: none;
+    z-index: 1000;
+    border-radius: var(--radius-sm);
+  }
+
+  .skip-link:focus {
+    top: var(--spacing-sm);
+  }
+
+  /* Header */
+  .header {
+    background: var(--color-neutral-100);
+    border-bottom: 1px solid var(--color-neutral-300);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: var(--header-height);
+  }
+
+  .header-container,
+  .breadcrumbs-list,
+  .footer-container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+  }
+
+  .header-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+  }
+
+  /* Brand Logo */
+  .brand-logo {
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .brand-logo a {
+    text-decoration: none;
+  }
+
+  /* Primary Navigation */
+  .primary-nav {
+    flex: 1;
+    display: none; /* Hidden on mobile */
+  }
+
+  .nav-list {
+    list-style: none;
+    display: flex;
+    gap: var(--spacing-lg);
+    align-items: center;
+  }
+
+  .nav-link {
+    color: var(--color-neutral-700);
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    padding: var(--spacing-sm) 0;
+    transition: color 120ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .nav-link:hover { color: var(--color-primary); }
+  .nav-link:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Search Bar */
+  .search-bar-container {
+    flex: 1;
+    max-width: 600px;
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background: var(--color-neutral-100);
+    border: 1px solid var(--color-neutral-300);
+    border-radius: var(--radius-md);
+    height: 56px;
+    padding: 0 var(--spacing-md);
+    transition: border-color 120ms, box-shadow 120ms;
+  }
+
+  .search-bar:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.1);
+  }
+
+  .search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 16px;
+    color: var(--color-neutral-700);
+    padding: 0 var(--spacing-sm);
+  }
+
+  .search-input::placeholder {
+    color: var(--color-neutral-400);
+  }
+
+  .search-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-neutral-400);
+    padding: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 120ms;
+    border-radius: var(--radius-sm);
+  }
+
+  .search-button:hover { color: var(--color-primary); }
+  .search-button:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Account Actions */
+  .account-actions {
+    display: none; /* Hidden on mobile */
+    gap: var(--spacing-sm);
+    align-items: center;
+  }
+
+  .btn-secondary,
+  .btn-ghost {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 120ms cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
+    border: none;
+    display: inline-block;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--color-neutral-400);
+    color: var(--color-neutral-700);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-primary);
+  }
+
+  .btn-ghost:hover { background: rgba(10, 102, 194, 0.05); }
+  .btn-secondary:focus,
+  .btn-ghost:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Breadcrumbs */
+  .breadcrumbs {
+    background: var(--color-neutral-100);
+    border-bottom: 1px solid var(--color-neutral-300);
+    padding: var(--spacing-sm) 0;
+  }
+
+  .breadcrumbs-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 14px;
+  }
+
+  .breadcrumbs-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+
+  .breadcrumbs-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color 120ms;
+  }
+
+  .breadcrumbs-link:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .breadcrumbs-link:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  .breadcrumbs-current {
+    color: var(--color-neutral-400);
+    font-weight: 500;
+  }
+
+  .breadcrumbs-separator {
+    color: var(--color-neutral-400);
+    margin: 0 var(--spacing-xs);
+  }
+
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    width: 100%;
+  }
+
+  /* Footer */
+  .footer {
+    background: var(--color-neutral-100);
+    border-top: 1px solid var(--color-neutral-300);
+    margin-top: var(--spacing-xxl);
+    padding: var(--spacing-xl) 0;
+  }
+
+  .footer-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-xl);
+  }
+
+  .footer-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .footer-title,
+  .footer-subtitle {
+    font-weight: 600;
+    color: var(--color-neutral-700);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .footer-title { font-size: 18px; }
+  .footer-subtitle { font-size: 14px; }
+
+  .footer-text {
+    font-size: 14px;
+    color: var(--color-neutral-400);
+  }
+
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .footer-links a {
+    color: var(--color-neutral-400);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 120ms;
+  }
+
+  .footer-links a:hover { color: var(--color-primary); }
+
+  .footer-bottom {
+    max-width: var(--container-max-width);
+    margin: var(--spacing-lg) auto 0;
+    padding: var(--spacing-md);
+    text-align: center;
+    border-top: 1px solid var(--color-neutral-300);
+    color: var(--color-neutral-400);
+    font-size: 12px;
+  }
+
+  /* Screen Reader Only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Responsive Design */
+  @media (min-width: 640px) {
+    .header-container { padding: 0 var(--spacing-lg); }
+    .account-actions { display: flex; }
+  }
+
+  @media (min-width: 920px) {
+    .primary-nav { display: block; }
+    .search-bar-container { flex: 1; }
+  }
+
+  @media (min-width: 1200px) {
+    .header-container { gap: var(--spacing-xl); }
+  }
+
+  /* Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>

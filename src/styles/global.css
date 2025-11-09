@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* CSS Variables basadas en design.json */
+:root {
+  /* Colors */
+  --color-primary: #0a66c2;
+  --color-accent: #00a6a6;
+  --color-neutral-100: #ffffff;
+  --color-neutral-200: #f6f7f9;
+  --color-neutral-300: #ebeef3;
+  --color-neutral-400: #c7cdd6;
+  --color-neutral-700: #2c3e50;
+  --color-success: #138d75;
+  --color-warning: #e08a00;
+  --color-danger: #d64545;
+
+  /* Typography */
+  --font-ui: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-display: Inter, "Segoe UI", system-ui, sans-serif;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* Shadows */
+  --shadow-card: 0 4px 12px rgba(10, 20, 30, 0.06);
+  --shadow-popover: 0 8px 24px rgba(10, 20, 30, 0.12);
+
+  /* Layout */
+  --header-height: 72px;
+  --container-max-width: 1440px;
+}

@@ -1,11 +1,67 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import MainLayout from '../layouts/MainLayout.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// SEO Metadata para página principal
+const siteUrl = "https://encuentrahogar.pe";
+const title = "Encuentra Hogar | Alquiler y Venta de Departamentos y Casas en Lima";
+const description = "Encuentra alquileres, casas y departamentos en Lima y todo el Perú. Busca por distrito, precio o tipo de inmueble.";
+const keywords = "alquiler departamentos Lima, venta casas Lima, inmuebles Perú, propiedades Lima, departamentos en alquiler";
+
+// Structured Data para página principal (WebSite)
+const websiteStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Encuentra Hogar",
+  "url": siteUrl,
+  "description": description,
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": `${siteUrl}/buscar?q={search_term_string}`
+    },
+    "query-input": "required name=search_term_string"
+  }
+};
+
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<MainLayout 
+  title={title}
+  description={description}
+  seo={{
+    keywords,
+    canonical: siteUrl
+  }}
+  social={{
+    ogImage: `${siteUrl}/images/og-default.jpg`,
+    ogType: "website"
+  }}
+  structuredData={websiteStructuredData}
+>
+	<div class="container">
+		<h1>Bienvenido a Encuentra Hogar</h1>
+		<p>Plataforma inmobiliaria para encontrar tu hogar ideal en Lima</p>
+	</div>
+</MainLayout>
+
+<style>
+	.container {
+		max-width: 1280px;
+		margin: 0 auto;
+		padding: var(--spacing-xl) var(--spacing-md);
+	}
+
+	h1 {
+		font-size: 32px;
+		font-weight: 600;
+		line-height: 40px;
+		color: var(--color-neutral-700);
+		margin-bottom: var(--spacing-md);
+	}
+
+	p {
+		font-size: 18px;
+		color: var(--color-neutral-400);
+	}
+</style>
