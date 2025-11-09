@@ -22,11 +22,18 @@ interface Props {
 
 const siteUrl = "https://encuentrahogar.pe";
 const siteName = "Encuentra Hogar";
-const defaultImage = `${siteUrl}/images/og-default.jpg`;
+const defaults = {
+  title: "Encuentra Hogar - Plataforma Inmobiliaria en Lima",
+  description: "Busca y encuentra departamentos para alquiler en Lima. Filtra por distrito, precio, habitaciones y más.",
+  keywords: "alquiler departamentos Lima, venta casas Lima, inmuebles Perú, propiedades Lima",
+  ogImage: `${siteUrl}/images/og-default.jpg`,
+  ogType: "website",
+  geo: { region: "Lima, PE", position: "-12.0464;-77.0428", ICBM: "-12.0464, -77.0428" }
+};
 
 const { 
-  title = "Encuentra Hogar - Plataforma Inmobiliaria en Lima",
-  description = "Busca y encuentra departamentos para alquiler en Lima. Filtra por distrito, precio, habitaciones y más.",
+  title = defaults.title,
+  description = defaults.description,
   seo = {},
   social = {},
   geo = {},
@@ -34,19 +41,15 @@ const {
   breadcrumbs
 } = Astro.props;
 
-// Valores por defecto para SEO
-const keywords = seo.keywords || "alquiler departamentos Lima, venta casas Lima, inmuebles Perú, propiedades Lima";
+// Valores finales con defaults
+const keywords = seo.keywords || defaults.keywords;
 const noindex = seo.noindex || false;
 const canonicalUrl = seo.canonical || new URL(Astro.url.pathname, siteUrl).href;
-
-// Valores por defecto para Social
-const ogImage = social.ogImage || defaultImage;
-const ogType = social.ogType || "website";
-
-// Valores por defecto para Geo
-const geoRegion = geo.region || "Lima, PE";
-const geoPosition = geo.position || "-12.0464;-77.0428";
-const ICBM = geo.ICBM || "-12.0464, -77.0428";
+const ogImage = social.ogImage || defaults.ogImage;
+const ogType = social.ogType || defaults.ogType;
+const geoRegion = geo.region || defaults.geo.region;
+const geoPosition = geo.position || defaults.geo.position;
+const ICBM = geo.ICBM || defaults.geo.ICBM;
 
 // Combinar structured data (incluyendo breadcrumbs si existen)
 const allStructuredData = [
@@ -107,7 +110,7 @@ const allStructuredData = [
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     
     {/* Structured Data JSON-LD */}
-    {allStructuredData.length > 0 && allStructuredData.map((data, index) => (
+    {allStructuredData.map((data) => (
       <script type="application/ld+json" set:html={JSON.stringify(data)} />
     ))}
   </head>
@@ -166,18 +169,21 @@ const allStructuredData = [
       {breadcrumbs && breadcrumbs.length > 0 && (
         <nav class="breadcrumbs" aria-label="Breadcrumb">
           <ol class="breadcrumbs-list">
-            {breadcrumbs.map((item, index) => (
-              <li class="breadcrumbs-item">
-                {index < breadcrumbs.length - 1 ? (
-                  <a href={item.url} class="breadcrumbs-link">{item.name}</a>
-                ) : (
-                  <span class="breadcrumbs-current" aria-current="page">{item.name}</span>
-                )}
-                {index < breadcrumbs.length - 1 && (
-                  <span class="breadcrumbs-separator" aria-hidden="true">/</span>
-                )}
-              </li>
-            ))}
+            {breadcrumbs.map((item, index) => {
+              const isLast = index === breadcrumbs.length - 1;
+              return (
+                <li class="breadcrumbs-item">
+                  {isLast ? (
+                    <span class="breadcrumbs-current" aria-current="page">{item.name}</span>
+                  ) : (
+                    <>
+                      <a href={item.url} class="breadcrumbs-link">{item.name}</a>
+                      <span class="breadcrumbs-separator" aria-hidden="true">/</span>
+                    </>
+                  )}
+                </li>
+              );
+            })}
           </ol>
         </nav>
       )}
@@ -302,16 +308,26 @@ const allStructuredData = [
     display: none; /* Hidden on mobile */
   }
 
-  .nav-list {
+  .nav-list,
+  .footer-links {
     list-style: none;
+  }
+
+  .nav-list {
     display: flex;
     gap: var(--spacing-lg);
     align-items: center;
   }
 
+  .nav-link,
+  .breadcrumbs-link,
+  .footer-links a {
+    text-decoration: none;
+    transition: color 120ms;
+  }
+
   .nav-link {
     color: var(--color-neutral-700);
-    text-decoration: none;
     font-size: 16px;
     font-weight: 500;
     padding: var(--spacing-sm) 0;
@@ -319,11 +335,6 @@ const allStructuredData = [
   }
 
   .nav-link:hover { color: var(--color-primary); }
-  .nav-link:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-    border-radius: var(--radius-sm);
-  }
 
   /* Search Bar */
   .search-bar-container {
@@ -375,10 +386,6 @@ const allStructuredData = [
   }
 
   .search-button:hover { color: var(--color-primary); }
-  .search-button:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-  }
 
   /* Account Actions */
   .account-actions {
@@ -398,10 +405,10 @@ const allStructuredData = [
     cursor: pointer;
     border: none;
     display: inline-block;
+    background: transparent;
   }
 
   .btn-secondary {
-    background: transparent;
     border: 1px solid var(--color-neutral-400);
     color: var(--color-neutral-700);
   }
@@ -412,16 +419,10 @@ const allStructuredData = [
   }
 
   .btn-ghost {
-    background: transparent;
     color: var(--color-primary);
   }
 
   .btn-ghost:hover { background: rgba(10, 102, 194, 0.05); }
-  .btn-secondary:focus,
-  .btn-ghost:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-  }
 
   /* Breadcrumbs */
   .breadcrumbs {
@@ -447,19 +448,11 @@ const allStructuredData = [
 
   .breadcrumbs-link {
     color: var(--color-primary);
-    text-decoration: none;
-    transition: color 120ms;
   }
 
   .breadcrumbs-link:hover {
     color: var(--color-accent);
     text-decoration: underline;
-  }
-
-  .breadcrumbs-link:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-    border-radius: var(--radius-sm);
   }
 
   .breadcrumbs-current {
@@ -514,7 +507,6 @@ const allStructuredData = [
   }
 
   .footer-links {
-    list-style: none;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
@@ -522,12 +514,25 @@ const allStructuredData = [
 
   .footer-links a {
     color: var(--color-neutral-400);
-    text-decoration: none;
     font-size: 14px;
-    transition: color 120ms;
   }
 
   .footer-links a:hover { color: var(--color-primary); }
+
+  /* Focus states compartidos */
+  .nav-link:focus,
+  .search-button:focus,
+  .btn-secondary:focus,
+  .btn-ghost:focus,
+  .breadcrumbs-link:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .nav-link:focus,
+  .breadcrumbs-link:focus {
+    border-radius: var(--radius-sm);
+  }
 
   .footer-bottom {
     max-width: var(--container-max-width);
